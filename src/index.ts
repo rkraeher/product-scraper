@@ -63,8 +63,8 @@ ranges.set(JSON.stringify(initialRange), initialRange);
 
 // we must track the prev range
 
-// halve the range
-const getHalvedRanges = (range: [number, number]) => {
+export const getHalvedRanges = (range: number[]) => {
+  // for now we will just handle non-negative integers
   let newUpperRange = [range[1] / 2, range[1]];
   let newLowerRange = [range[0], range[1] / 2 - 1];
 
@@ -74,6 +74,7 @@ const getHalvedRanges = (range: [number, number]) => {
   };
 };
 
-//const splitRanges = getSplitRanges(ranges.get(JSON.stringify(initialRange)));
+const splitRanges = getHalvedRanges(ranges.get(JSON.stringify(initialRange)));
+console.log(splitRanges);
 
 // call each new range and check for 1000 again

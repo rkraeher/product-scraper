@@ -5,15 +5,23 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "start": "npx ts-node src/index.ts"
   },
   "keywords": [],
   "author": "rkraeher",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.22.8",
+    "@babel/preset-env": "^7.22.7",
+    "@babel/preset-typescript": "^7.22.5",
     "@faker-js/faker": "^8.0.2",
+    "@types/jest": "^29.5.2",
     "@types/node": "^20.4.1",
+    "babel-jest": "^29.6.1",
     "fs": "^0.0.1-security",
+    "jest": "^29.6.1",
+    "ts-jest": "^29.1.1",
     "typescript": "^5.1.6"
   }
 }
