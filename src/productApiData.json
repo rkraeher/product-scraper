@@ -1,0 +1,52 @@
+[
+  {
+    "productId": "f09626ed-32ce-4b99-a62a-d7cf544f252a",
+    "name": "Soap",
+    "price": "4953"
+  },
+  {
+    "productId": "b2bd298e-afa0-4bdd-b916-f497e5c6741d",
+    "name": "Towels",
+    "price": "82848"
+  },
+  {
+    "productId": "8c12f02d-ec5c-48b8-9037-bb2da79606ae",
+    "name": "Computer",
+    "price": "83612"
+  },
+  {
+    "productId": "adc15e09-6414-4025-a5f6-a68bf744c817",
+    "name": "Towels",
+    "price": "62161"
+  },
+  {
+    "productId": "a80c7f6e-cbc9-4c34-9f59-b5f0069eddc4",
+    "name": "Pants",
+    "price": "13922"
+  },
+  {
+    "productId": "68deaac6-e60d-4bc9-9b55-77e64b745e94",
+    "name": "Chips",
+    "price": "70000"
+  },
+  {
+    "productId": "dc2469ec-132d-46f3-baa4-f5f9e1b94537",
+    "name": "Keyboard",
+    "price": "49694"
+  },
+  {
+    "productId": "d4739920-acd8-46ab-aad3-7f3e18dfc2ca",
+    "name": "Bike",
+    "price": "28332"
+  },
+  {
+    "productId": "0fa2ca24-e401-4c24-8c9a-3870f27d828f",
+    "name": "Hat",
+    "price": "242"
+  },
+  {
+    "productId": "19693971-da54-4a09-b669-1367e197ea5d",
+    "name": "Tuna",
+    "price": "83487"
+  }
+]
