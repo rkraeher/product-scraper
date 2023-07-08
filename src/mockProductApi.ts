@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { Product } from './index';
 
-function mockProductApi(): Product[] | undefined {
+function mockProductApi(): Product[] {
   let mockData;
   try {
     const mockDataString = fs.readFileSync('src/productApiData.json', 'utf-8');
@@ -9,7 +9,7 @@ function mockProductApi(): Product[] | undefined {
   } catch (err) {
     console.error(err);
   }
-  return mockData ? mockData : undefined;
+  return mockData ? mockData : [];
 }
 
 export const mockProductData = mockProductApi();

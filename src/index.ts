@@ -3,7 +3,7 @@ import { mockProductData } from './mockProductApi';
 export interface Product {
   productId: string;
   name: string;
-  price?: string | number;
+  price: string | number;
 }
 
 interface ApiResponse {
@@ -18,35 +18,31 @@ interface ApiResponse {
 // This simple conversion stands in for what would be a much more robust validation/conversion
 // which would potentially have to handle different currencies and floats
 function convertPriceStringToNumber(price: string) {
-  if (price) {
-    return parseInt(price);
-  }
-  return;
+  return parseInt(price);
 }
 
 const data = mockProductData;
 
-export function getProducts(range: number[], data?: Product[]): ApiResponse {
+export function getProducts(range: number[], data: Product[]): ApiResponse {
   let products: Product[] = [];
   const [min, max] = range;
 
-  if (data) {
-    for (let product of data) {
-      let price = convertPriceStringToNumber(product.price as string);
-      const isPriceWithinRange = price && price >= min && price <= max;
+  for (let product of data) {
+    let price = convertPriceStringToNumber(product.price as string);
+    const isPriceWithinRange = price && price >= min && price <= max;
 
-      if (isPriceWithinRange && products.length < 1000) {
-        products.push({
-          productId: product.productId,
-          name: product.name,
-          price: convertPriceStringToNumber(product.price as string),
-        });
-      }
+    // we still need the total within the range, not just the count
+    if (isPriceWithinRange && products.length < 1000) {
+      products.push({
+        productId: product.productId,
+        name: product.name,
+        price,
+      });
     }
   }
 
   return {
-    total: data?.length ?? 0,
+    total: data.length,
     // this will become more specific and only return first 1000 products
     count: products.length,
     products,
@@ -55,7 +51,12 @@ export function getProducts(range: number[], data?: Product[]): ApiResponse {
 
 const testRange = [0, 300];
 const response = getProducts(testRange, data);
-console.log(response, `inputRange: ${testRange}`);
+console.log(
+  response,
+  `inputRange: ${testRange}`,
+  `count: ${response.count}`,
+  `total: ${response.total}`
+);
 
 // initial call
 const initialRange = [0, 100000];
