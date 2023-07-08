@@ -3,7 +3,13 @@ import { mockProductData } from './mockProductApi';
 export interface Product {
   productId: string;
   name: string;
-  price: string;
+  price?: string | number;
+}
+
+interface ApiResponse {
+  total: number;
+  count: number;
+  products: Product[];
 }
 
 // This simple conversion stands in for what would be a much more robust validation/conversion
@@ -15,22 +21,26 @@ function convertPriceStringToNumber(price: string) {
   return;
 }
 
-function getProducts(min: number, max: number): Product[] | undefined {
+function getProducts(min: number, max: number): ApiResponse | undefined {
+  let scrapedProducts: Product[] = [];
+
   if (mockProductData) {
     for (let product of mockProductData) {
-      let parsedProduct = {
+      scrapedProducts.push({
         productId: product.productId,
         name: product.name,
-        price: convertPriceStringToNumber(product.price),
-      };
-      console.log(
-        parsedProduct,
-        typeof parsedProduct.price === 'number',
-        product.price
-      );
+        price: convertPriceStringToNumber(product.price as string),
+      });
     }
+
+    return {
+      total: scrapedProducts.length,
+      // this will become more specific
+      count: scrapedProducts.length,
+      products: scrapedProducts,
+    };
   }
   return;
 }
 
-getProducts(0, 100000);
+console.log(getProducts(0, 100000));
