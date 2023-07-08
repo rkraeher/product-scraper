@@ -12,16 +12,14 @@ interface ApiResponse {
   products: Product[];
 }
 
-// we will eventually be adding to this, our growing list of all products
-//let scrapedProducts: Product[] = [];
+let scrapedProducts: any = [];
+const data = mockProductData;
+let bifurcateCallCount = 1;
 
-// This simple conversion stands in for what would be a much more robust validation/conversion
-// which would potentially have to handle different currencies and floats
+// in a real life context there would be more robust validation/conversion, handling different currencies and floats, etc.
 function convertPriceStringToNumber(price: string) {
   return parseInt(price);
 }
-
-const data = mockProductData;
 
 export function getProducts(range: number[], data: Product[]): ApiResponse {
   let products: Product[] = [];
@@ -40,7 +38,6 @@ export function getProducts(range: number[], data: Product[]): ApiResponse {
           price,
         });
 
-      // we still need the total within the range, not just the count
       allProductsWithinRange.push({
         productId: product.productId,
         name: product.name,
@@ -56,37 +53,65 @@ export function getProducts(range: number[], data: Product[]): ApiResponse {
   };
 }
 
-const testRange = [0, 50000];
-const response = getProducts(testRange, data);
-console.log(
-  response,
-  `testRange: ${testRange}`,
-  `count: ${response.count}`,
-  `total: ${response.total}`
-);
-
-// initial call
-const initialRange = [0, 100000];
-
-// we must track the prev range
-const ranges = new Map();
-ranges.set(JSON.stringify(initialRange), initialRange);
-
-// maybe should be while loop
-// while total > 1000
-
-export const getHalvedRanges = (range: number[]) => {
+// TODO please fix my tests
+// I think I am broken
+export const getSplitRanges = (range: number[]) => {
   // for now we will just handle non-negative integers
-  let newUpperRange = [range[1] / 2, range[1]];
-  let newLowerRange = [range[0], range[1] / 2 - 1];
+  let lowerRange = [range[0], range[1] / 2 - 1];
+  let upperRange = [range[1] / 2, range[1]];
+
+  // this /2 - 1 is too imprecise (and doesn't account for decimals)
+  // there seem to be 2 or 3 extra calls, with duplicate ranges
+  console.log({
+    lowerRange,
+    upperRange,
+  });
 
   return {
-    newLowerRange,
-    newUpperRange,
+    lowerRange,
+    upperRange,
   };
 };
 
-const splitRanges = getHalvedRanges(ranges.get(JSON.stringify(initialRange)));
-// console.log(splitRanges);
+function scrapeAllProducts(range: number[]) {
+  const { lowerRange, upperRange } = getSplitRanges(range);
+  bifurcateCallCount++;
 
-// call each new range and check for 1000 again
+  // get products, total and count within this range
+  // TODO: rename for clarity, because it isn't only the products but the apiResponse with total and count
+  const lowerRangeProducts = getProducts(lowerRange, data);
+  const upperRangeProducts = getProducts(upperRange, data);
+
+  if (lowerRangeProducts.count <= 1000) {
+    scrapedProducts.push(...lowerRangeProducts.products);
+  }
+
+  if (upperRangeProducts.count <= 1000) {
+    scrapedProducts.push(...upperRangeProducts.products);
+  }
+
+  if (lowerRangeProducts.total > 1000 && scrapedProducts.length < data.length) {
+    scrapeAllProducts(lowerRange);
+  }
+
+  if (upperRangeProducts.total > 1000 && scrapedProducts.length < data.length) {
+    scrapeAllProducts(upperRange);
+  }
+}
+
+if (scrapedProducts.length < data.length) {
+  const initialPriceRange = [0, 100000];
+  scrapeAllProducts(initialPriceRange);
+}
+
+console.log(
+  //{ scrapedProducts },
+  //{ data },
+  'scrapedProducts.length: ',
+  scrapedProducts.length,
+  'data.length: ',
+  data.length,
+  // find a way to directly verify that the scrapedProducts has all from the api without duplicates
+  // scrapedProducts === data,
+  { bifurcateCallCount }
+);

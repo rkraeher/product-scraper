@@ -14,7 +14,8 @@ function createRandomProduct() {
 }
 
 const PRODUCTS = faker.helpers.multiple(createRandomProduct, {
-  count: 9999,
+  // data.length
+  count: 8000,
 });
 
 fs.writeFile(

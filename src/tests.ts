@@ -1,4 +1,4 @@
-import { Product, getHalvedRanges, getProducts } from './index';
+import { Product, getSplitRanges, getProducts } from './index';
 
 const mockProductData: Product[] = [
   {
@@ -53,23 +53,24 @@ const mockProductData: Product[] = [
   },
 ];
 
-describe('getHalvedRanges', () => {
+describe('getSplitRanges', () => {
   it('should return the halved ranges correctly', () => {
     const range = [1, 10];
+    // not good. this hardcoding the assertion object makes the test brittle
     const expected = {
-      newLowerRange: [1, 4],
-      newUpperRange: [5, 10],
+      lowerRange: [1, 4],
+      upperRange: [5, 10],
     };
-    expect(getHalvedRanges(range)).toEqual(expected);
+    expect(getSplitRanges(range)).toEqual(expected);
   });
 
   it('should handle zero correctly', () => {
     const range = [0, 10];
     const expected = {
-      newLowerRange: [0, 4],
-      newUpperRange: [5, 10],
+      lowerRange: [0, 4],
+      upperRange: [5, 10],
     };
-    expect(getHalvedRanges(range)).toEqual(expected);
+    expect(getSplitRanges(range)).toEqual(expected);
   });
 
   // this one would be important for price data
@@ -79,7 +80,7 @@ describe('getHalvedRanges', () => {
       newLowerRange: [1.5, 4.75],
       newUpperRange: [4.75, 9.5],
     };
-    expect(getHalvedRanges(range)).toEqual(expected);
+    expect(getSplitRanges(range)).toEqual(expected);
   });
 
   it.skip('should handle negative numbers correctly', () => {
@@ -88,7 +89,7 @@ describe('getHalvedRanges', () => {
       newLowerRange: [-5, 2.5],
       newUpperRange: [2.5, 5],
     };
-    expect(getHalvedRanges(range)).toEqual(expected);
+    expect(getSplitRanges(range)).toEqual(expected);
   });
 });
 
