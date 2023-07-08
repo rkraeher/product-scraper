@@ -1,19 +1,18 @@
-import * as fs from 'fs';
+import { mockProductData } from './mockProductApi';
 
-try {
-  const jsonString = fs.readFileSync('src/productApiData.json', 'utf-8');
-  const jsonData = JSON.parse(jsonString);
-  console.log('data was read', jsonData);
-} catch (err) {
-  console.error(err);
-}
-
-// numbers must be converted to string
-
-interface Product {
+export interface Product {
   productId: string;
   name: string;
   price: string;
+}
+
+console.log({ mockProductData });
+
+function convertNumber(price: string) {
+  if (price) {
+    return parseInt(price);
+  }
+  return null;
 }
 
 function getProducts(min: number, max: number): Product[] | null {
