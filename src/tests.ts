@@ -1,4 +1,57 @@
-import { getHalvedRanges } from './index';
+import { Product, getHalvedRanges, getProducts } from './index';
+
+const mockProductData: Product[] = [
+  {
+    productId: '1',
+    name: 'Product 1',
+    price: 100,
+  },
+  {
+    productId: '2',
+    name: 'Product 2',
+    price: 200,
+  },
+  {
+    productId: '3',
+    name: 'Product 3',
+    price: 300,
+  },
+  {
+    productId: '4',
+    name: 'Product 4',
+    price: 400,
+  },
+  {
+    productId: '5',
+    name: 'Product 5',
+    price: 500,
+  },
+  {
+    productId: '6',
+    name: 'Product 6',
+    price: 600,
+  },
+  {
+    productId: '7',
+    name: 'Product 7',
+    price: 700,
+  },
+  {
+    productId: '8',
+    name: 'Product 8',
+    price: 800,
+  },
+  {
+    productId: '9',
+    name: 'Product 9',
+    price: 900,
+  },
+  {
+    productId: '10',
+    name: 'Product 10',
+    price: 1000,
+  },
+];
 
 describe('getHalvedRanges', () => {
   it('should return the halved ranges correctly', () => {
@@ -36,5 +89,61 @@ describe('getHalvedRanges', () => {
       newUpperRange: [2.5, 5],
     };
     expect(getHalvedRanges(range)).toEqual(expected);
+  });
+});
+
+describe('getProducts', () => {
+  it('should return the correct count of products within the price range', () => {
+    const range: [number, number] = [300, 800];
+    const expectedCount = 6;
+
+    const result = getProducts(range, mockProductData);
+
+    expect(result.count).toBe(expectedCount);
+  });
+
+  it('should return the correct count of products when no products are within the price range', () => {
+    const range: [number, number] = [1200, 1500];
+    const expectedCount = 0;
+
+    const result = getProducts(range, mockProductData);
+
+    expect(result.count).toBe(expectedCount);
+  });
+
+  it('should handle an empty product data array', () => {
+    const range = [100, 200];
+    const expectedCount = 0;
+
+    const result = getProducts(range, []);
+
+    expect(result.count).toBe(expectedCount);
+  });
+
+  it('should handle invalid price values in the product data', () => {
+    const range: [number, number] = [100, 200];
+    let mockDataWithInvalidProduct = mockProductData;
+    const expectedCount = 2;
+    const expectedTotal = 11;
+
+    // Add a product with an invalid price to the mock product data
+    mockDataWithInvalidProduct.push({
+      productId: 'invalid-product-id',
+      name: 'Invalid Product',
+      price: NaN,
+    });
+
+    const result = getProducts(range, mockDataWithInvalidProduct);
+
+    expect(result.count).toBe(expectedCount);
+    expect(result.total).toBe(expectedTotal);
+  });
+
+  it('should return a maximum of 1000 products', () => {
+    const range = [0, 5000];
+
+    const result = getProducts(range, mockProductData);
+
+    expect(result.count).toBeLessThanOrEqual(1000);
   });
 });

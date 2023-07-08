@@ -12,6 +12,9 @@ interface ApiResponse {
   products: Product[];
 }
 
+// we will eventually be adding to this, our growing list of all products
+//let scrapedProducts: Product[] = [];
+
 // This simple conversion stands in for what would be a much more robust validation/conversion
 // which would potentially have to handle different currencies and floats
 function convertPriceStringToNumber(price: string) {
@@ -21,47 +24,48 @@ function convertPriceStringToNumber(price: string) {
   return;
 }
 
-function getProducts(min: number, max: number): ApiResponse {
-  let scrapedProducts: Product[] = [];
+const data = mockProductData;
 
-  if (mockProductData) {
-    for (let product of mockProductData) {
-      scrapedProducts.push({
-        productId: product.productId,
-        name: product.name,
-        price: convertPriceStringToNumber(product.price as string),
-      });
+export function getProducts(range: number[], data?: Product[]): ApiResponse {
+  let products: Product[] = [];
+  const [min, max] = range;
+
+  if (data) {
+    for (let product of data) {
+      let price = convertPriceStringToNumber(product.price as string);
+      const isPriceWithinRange = price && price >= min && price <= max;
+
+      if (isPriceWithinRange && products.length < 1000) {
+        products.push({
+          productId: product.productId,
+          name: product.name,
+          price: convertPriceStringToNumber(product.price as string),
+        });
+      }
     }
   }
 
   return {
-    total: scrapedProducts.length,
+    total: data?.length ?? 0,
     // this will become more specific and only return first 1000 products
-    count: scrapedProducts.length,
-    products: scrapedProducts,
+    count: products.length,
+    products,
   };
 }
 
-// we need a program for splitting the min/max range and then calling getProducts
-
-// continually call the shrinking range until we get to a count of 1000 or less
-// add those 1000 or less items to our product list
-// stop calling that range
-
-// theres the checking for 1000
-// then theres keeping track of a range, and splitting it
+const testRange = [0, 300];
+const response = getProducts(testRange, data);
+console.log(response, `inputRange: ${testRange}`);
 
 // initial call
 const initialRange = [0, 100000];
-//const response = getProducts(initialRange[0], initialRange[1]);
 
+// we must track the prev range
 const ranges = new Map();
 ranges.set(JSON.stringify(initialRange), initialRange);
 
 // maybe should be while loop
 // while total > 1000
-
-// we must track the prev range
 
 export const getHalvedRanges = (range: number[]) => {
   // for now we will just handle non-negative integers
@@ -75,6 +79,6 @@ export const getHalvedRanges = (range: number[]) => {
 };
 
 const splitRanges = getHalvedRanges(ranges.get(JSON.stringify(initialRange)));
-console.log(splitRanges);
+// console.log(splitRanges);
 
 // call each new range and check for 1000 again
