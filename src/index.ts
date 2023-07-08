@@ -21,7 +21,7 @@ function convertPriceStringToNumber(price: string) {
   return;
 }
 
-function getProducts(min: number, max: number): ApiResponse | undefined {
+function getProducts(min: number, max: number): ApiResponse {
   let scrapedProducts: Product[] = [];
 
   if (mockProductData) {
@@ -32,15 +32,48 @@ function getProducts(min: number, max: number): ApiResponse | undefined {
         price: convertPriceStringToNumber(product.price as string),
       });
     }
-
-    return {
-      total: scrapedProducts.length,
-      // this will become more specific
-      count: scrapedProducts.length,
-      products: scrapedProducts,
-    };
   }
-  return;
+
+  return {
+    total: scrapedProducts.length,
+    // this will become more specific and only return first 1000 products
+    count: scrapedProducts.length,
+    products: scrapedProducts,
+  };
 }
 
-console.log(getProducts(0, 100000));
+// we need a program for splitting the min/max range and then calling getProducts
+
+// continually call the shrinking range until we get to a count of 1000 or less
+// add those 1000 or less items to our product list
+// stop calling that range
+
+// theres the checking for 1000
+// then theres keeping track of a range, and splitting it
+
+// initial call
+const initialRange = [0, 100000];
+//const response = getProducts(initialRange[0], initialRange[1]);
+
+const ranges = new Map();
+ranges.set(JSON.stringify(initialRange), initialRange);
+
+// maybe should be while loop
+// while total > 1000
+
+// we must track the prev range
+
+// halve the range
+const getHalvedRanges = (range: [number, number]) => {
+  let newUpperRange = [range[1] / 2, range[1]];
+  let newLowerRange = [range[0], range[1] / 2 - 1];
+
+  return {
+    newLowerRange,
+    newUpperRange,
+  };
+};
+
+//const splitRanges = getSplitRanges(ranges.get(JSON.stringify(initialRange)));
+
+// call each new range and check for 1000 again
