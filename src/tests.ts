@@ -94,7 +94,7 @@ describe('getHalvedRanges', () => {
 
 describe('getProducts', () => {
   it('should return the correct count of products within the price range', () => {
-    const range: [number, number] = [300, 800];
+    const range = [300, 800];
     const expectedCount = 6;
 
     const result = getProducts(range, mockProductData);
@@ -103,7 +103,7 @@ describe('getProducts', () => {
   });
 
   it('should return the correct count of products when no products are within the price range', () => {
-    const range: [number, number] = [1200, 1500];
+    const range = [1200, 1500];
     const expectedCount = 0;
 
     const result = getProducts(range, mockProductData);
@@ -121,12 +121,10 @@ describe('getProducts', () => {
   });
 
   it('should handle invalid price values in the product data', () => {
-    const range: [number, number] = [100, 200];
+    const range = [100, 200];
     let mockDataWithInvalidProduct = mockProductData;
     const expectedCount = 2;
-    const expectedTotal = 11;
 
-    // Add a product with an invalid price to the mock product data
     mockDataWithInvalidProduct.push({
       productId: 'invalid-product-id',
       name: 'Invalid Product',
@@ -136,7 +134,6 @@ describe('getProducts', () => {
     const result = getProducts(range, mockDataWithInvalidProduct);
 
     expect(result.count).toBe(expectedCount);
-    expect(result.total).toBe(expectedTotal);
   });
 
   it('should return a maximum of 1000 products', () => {

@@ -25,15 +25,23 @@ const data = mockProductData;
 
 export function getProducts(range: number[], data: Product[]): ApiResponse {
   let products: Product[] = [];
+  let allProductsWithinRange: Product[] = [];
   const [min, max] = range;
 
   for (let product of data) {
     let price = convertPriceStringToNumber(product.price as string);
-    const isPriceWithinRange = price && price >= min && price <= max;
+    const isPriceWithinRange = price >= min && price <= max;
 
-    // we still need the total within the range, not just the count
-    if (isPriceWithinRange && products.length < 1000) {
-      products.push({
+    if (isPriceWithinRange) {
+      if (products.length < 1000)
+        products.push({
+          productId: product.productId,
+          name: product.name,
+          price,
+        });
+
+      // we still need the total within the range, not just the count
+      allProductsWithinRange.push({
         productId: product.productId,
         name: product.name,
         price,
@@ -42,18 +50,17 @@ export function getProducts(range: number[], data: Product[]): ApiResponse {
   }
 
   return {
-    total: data.length,
-    // this will become more specific and only return first 1000 products
+    total: allProductsWithinRange.length,
     count: products.length,
     products,
   };
 }
 
-const testRange = [0, 300];
+const testRange = [0, 50000];
 const response = getProducts(testRange, data);
 console.log(
   response,
-  `inputRange: ${testRange}`,
+  `testRange: ${testRange}`,
   `count: ${response.count}`,
   `total: ${response.total}`
 );
