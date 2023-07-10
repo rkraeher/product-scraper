@@ -15,6 +15,7 @@ interface ApiResponse {
 const initialPriceRange = [0, 100000];
 let scrapedProducts: Product[] = [];
 let scrapedProductIds = new Set<string>();
+let numberOfApiRequests = 0;
 
 // in a real life context there would be more robust validation/conversion,
 // handling different currencies and floats, etc.
@@ -39,15 +40,16 @@ export function getProductDataFromApi(
   let products: Product[] = [];
   let productsInRange: string[] = [];
   const [min, max] = range;
+  numberOfApiRequests++;
 
   for (let product of data) {
     let price = convertPriceStringToNumber(product.price as string);
     const isPriceWithinRange = price >= min && price <= max;
+    // this is an inelegant solution to the problem I have of pushing duplicate products
+    // checking duplicates this way degrades performance
     const isDuplicateProduct = scrapedProductIds.has(product.productId);
 
     if (isPriceWithinRange) {
-      // this is an inelegant solution to the problem I have of pushing duplicate products
-      // checking duplicates this way degrades performance
       if (products.length < 1000 && !isDuplicateProduct) {
         products.push({
           productId: product.productId,
@@ -56,7 +58,7 @@ export function getProductDataFromApi(
         });
         scrapedProductIds.add(product.productId);
       }
-      // we only need to track the length for 'total', so all the product data isn't needed
+
       productsInRange.push(product.productId);
     }
   }
@@ -92,11 +94,12 @@ export function scrapeAllProducts(range: number[]) {
 
 scrapeAllProducts(initialPriceRange);
 
-// do what we want with out scrapedProducts
+// do what we want with our scrapedProducts
 console.log(
   scrapedProducts,
   'scrapedProducts.length: ',
   scrapedProducts.length,
   'mockProductData.length: ',
-  mockProductData.length
+  mockProductData.length,
+  { numberOfApiRequests }
 );
