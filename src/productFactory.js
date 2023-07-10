@@ -13,14 +13,13 @@ function createRandomProduct() {
   };
 }
 
-const PRODUCTS = faker.helpers.multiple(createRandomProduct, {
-  // data.length
-  count: 8000,
+const MOCK_PRODUCT_DATA = faker.helpers.multiple(createRandomProduct, {
+  count: 9999,
 });
 
 fs.writeFile(
   'src/productApiData.json',
-  JSON.stringify(PRODUCTS),
+  JSON.stringify(MOCK_PRODUCT_DATA),
   'utf-8',
   (err) => {
     if (err) {
