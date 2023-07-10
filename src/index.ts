@@ -29,82 +29,65 @@ export function splitRangeInHalves(range: number[]) {
   };
 }
 
-export function getProducts(range: number[], data: Product[]): ApiResponse {
+// here we simulate calling the api and receiving a response back
+// in order to enable testing, I am scanning the entire mockData but of course
+// their api would just be sending us back this data and we would have to check for duplicates
+export function getProductDataFromApi(
+  range: number[],
+  data: Product[]
+): ApiResponse {
   let products: Product[] = [];
-  let allProductsWithinRange: string[] = [];
+  let productsInRange: string[] = [];
   const [min, max] = range;
 
   for (let product of data) {
     let price = convertPriceStringToNumber(product.price as string);
     const isPriceWithinRange = price >= min && price <= max;
+    const isDuplicateProduct = scrapedProductIds.has(product.productId);
 
     if (isPriceWithinRange) {
       // this is an inelegant solution to the problem I have of pushing duplicate products
       // checking duplicates this way degrades performance
-      const productId = product.productId;
-      if (products.length < 1000 && !scrapedProductIds.has(productId)) {
+      if (products.length < 1000 && !isDuplicateProduct) {
         products.push({
           productId: product.productId,
           name: product.name,
           price,
         });
-
-        scrapedProductIds.add(productId);
+        scrapedProductIds.add(product.productId);
       }
-
       // we only need to track the length for 'total', so all the product data isn't needed
-      allProductsWithinRange.push(product.productId);
+      productsInRange.push(product.productId);
     }
   }
 
   return {
-    total: allProductsWithinRange.length,
+    total: productsInRange.length,
     count: products.length,
     products,
   };
 }
 
-// function pushOrContinueToScrape(
-//   productApiReponse: ApiResponse,
-//   range: number[]
-// ) {
-//   if (productApiReponse.count <= 1000) {
-//     // should I use the global scoped scrapedProducts?
-//     return scrapedProducts.push(productApiReponse.products);
-//   } else if (productApiReponse.total > 1000) {
-//     return scrapeAllProducts(range);
-//   }
-// }
-
 function scrapeAllProducts(range: number[]) {
   const { lowerRange, upperRange } = splitRangeInHalves(range);
 
-  // get products, total and count within this range
-  // TODO: rename for clarity, because it isn't only the products but the apiResponse with total and count
-  const lowerRangeProducts = getProducts(lowerRange, mockProductData);
-  const upperRangeProducts = getProducts(upperRange, mockProductData);
+  const scrapeRange = (range: number[]) => {
+    const { count, products, total } = getProductDataFromApi(
+      range,
+      mockProductData
+    );
 
-  if (lowerRangeProducts.count <= 1000) {
-    scrapedProducts.push(...lowerRangeProducts.products);
-  }
+    if (count <= 1000) {
+      scrapedProducts.push(...products);
+    }
 
-  if (upperRangeProducts.count <= 1000) {
-    scrapedProducts.push(...upperRangeProducts.products);
-  }
+    if (total > 1000 && scrapedProducts.length < mockProductData.length) {
+      scrapeAllProducts(range);
+    }
+  };
 
-  if (
-    lowerRangeProducts.total > 1000 &&
-    scrapedProducts.length < mockProductData.length
-  ) {
-    scrapeAllProducts(lowerRange);
-  }
-
-  if (
-    upperRangeProducts.total > 1000 &&
-    scrapedProducts.length < mockProductData.length
-  ) {
-    scrapeAllProducts(upperRange);
-  }
+  scrapeRange(lowerRange);
+  scrapeRange(upperRange);
 
   console.log({ lowerRange, upperRange });
 }

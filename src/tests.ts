@@ -1,4 +1,4 @@
-import { Product, splitRangeInHalves, getProducts } from './index';
+import { Product, splitRangeInHalves, getProductDataFromApi } from './index';
 import { mockProductData as largeDataset } from './mockProductApi';
 
 const mockProductData: Product[] = [
@@ -85,12 +85,12 @@ describe('splitRangeInHalves', () => {
   // we could also include an invalid test case checking for an error when passing negative values to the fn
 });
 
-describe('getProducts', () => {
+describe('getProductDataFromApi', () => {
   it('should return the correct count of products within the price range', () => {
     const range = [300, 800];
     const expectedCount = 6;
 
-    const result = getProducts(range, mockProductData);
+    const result = getProductDataFromApi(range, mockProductData);
 
     expect(result.count).toBe(expectedCount);
   });
@@ -99,7 +99,7 @@ describe('getProducts', () => {
     const range = [1200, 1500];
     const expectedCount = 0;
 
-    const result = getProducts(range, mockProductData);
+    const result = getProductDataFromApi(range, mockProductData);
 
     expect(result.count).toBe(expectedCount);
   });
@@ -108,7 +108,7 @@ describe('getProducts', () => {
     const range = [100, 200];
     const expectedCount = 0;
 
-    const result = getProducts(range, []);
+    const result = getProductDataFromApi(range, []);
 
     expect(result.count).toBe(expectedCount);
   });
@@ -124,7 +124,7 @@ describe('getProducts', () => {
       price: NaN,
     });
 
-    const result = getProducts(range, mockDataWithInvalidProduct);
+    const result = getProductDataFromApi(range, mockDataWithInvalidProduct);
 
     expect(result.count).toBe(expectedCount);
   });
@@ -135,7 +135,7 @@ describe('getProducts', () => {
     // For this test we need a larger dataset than our local mock
     // I prefer to do it this way rather than make the whole mockData larger
     // because is easier to skim a small mockData array when reviewing all the other tests
-    const result = getProducts(range, largeDataset);
+    const result = getProductDataFromApi(range, largeDataset);
 
     expect(result.count).toBeLessThanOrEqual(1000);
     expect(result.total).toBeGreaterThan(1000);
