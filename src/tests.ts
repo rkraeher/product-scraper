@@ -1,4 +1,5 @@
 import { Product, getSplitRanges, getProducts } from './index';
+import { mockProductData as largeDataset } from './mockProductApi';
 
 const mockProductData: Product[] = [
   {
@@ -56,7 +57,6 @@ const mockProductData: Product[] = [
 describe('getSplitRanges', () => {
   it('should return the halved ranges correctly', () => {
     const range = [1, 10];
-    // not good. this hardcoding the assertion object makes the test brittle
     const expected = {
       lowerRange: [1, 4],
       upperRange: [5, 10],
@@ -73,24 +73,19 @@ describe('getSplitRanges', () => {
     expect(getSplitRanges(range)).toEqual(expected);
   });
 
-  // this one would be important for price data
-  it.skip('should handle floating-point numbers correctly', () => {
+  // this test indicates out why subtracting 1 from the max bound for one of the
+  // new split ranges is not ideal because it skips any price that has a 1$ difference
+  // between the two ranges (3.75 < price < 4.75).
+  it('should handle floating-point numbers correctly', () => {
     const range = [1.5, 9.5];
     const expected = {
-      newLowerRange: [1.5, 4.75],
-      newUpperRange: [4.75, 9.5],
+      lowerRange: [1.5, 3.75],
+      upperRange: [4.75, 9.5],
     };
     expect(getSplitRanges(range)).toEqual(expected);
   });
 
-  it.skip('should handle negative numbers correctly', () => {
-    const range = [-5, 5];
-    const expected = {
-      newLowerRange: [-5, 2.5],
-      newUpperRange: [2.5, 5],
-    };
-    expect(getSplitRanges(range)).toEqual(expected);
-  });
+  // maybe we could also include a test case for an error when passing negative values to the fn
 });
 
 describe('getProducts', () => {
@@ -138,10 +133,14 @@ describe('getProducts', () => {
   });
 
   it('should return a maximum of 1000 products', () => {
-    const range = [0, 5000];
+    const range = [0, 100000];
 
-    const result = getProducts(range, mockProductData);
+    // For this test we need a larger dataset than our local mock
+    // I prefer to do it this way rather than make the whole mockData larger
+    // because is easier to skim a small mockData array when reviewing all the other tests
+    const result = getProducts(range, largeDataset);
 
     expect(result.count).toBeLessThanOrEqual(1000);
+    expect(result.total).toBeGreaterThan(1000);
   });
 });

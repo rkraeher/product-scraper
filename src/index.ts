@@ -53,19 +53,11 @@ export function getProducts(range: number[], data: Product[]): ApiResponse {
   };
 }
 
-// TODO please fix my tests
-// I think I am broken
 export const getSplitRanges = (range: number[]) => {
   // for now we will just handle non-negative integers
+
   let lowerRange = [range[0], range[1] / 2 - 1];
   let upperRange = [range[1] / 2, range[1]];
-
-  // this /2 - 1 is too imprecise (and doesn't account for decimals)
-  // there seem to be 2 or 3 extra calls, with duplicate ranges
-  console.log({
-    lowerRange,
-    upperRange,
-  });
 
   return {
     lowerRange,
