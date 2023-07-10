@@ -68,7 +68,7 @@ export function getProductDataFromApi(
   };
 }
 
-function scrapeAllProducts(range: number[]) {
+export function scrapeAllProducts(range: number[]) {
   const { lowerRange, upperRange } = splitRangeInHalves(range);
 
   const scrapeRange = (range: number[]) => {
@@ -88,13 +88,13 @@ function scrapeAllProducts(range: number[]) {
 
   scrapeRange(lowerRange);
   scrapeRange(upperRange);
-
-  console.log({ lowerRange, upperRange });
 }
 
 scrapeAllProducts(initialPriceRange);
 
+// do what we want with out scrapedProducts
 console.log(
+  scrapedProducts,
   'scrapedProducts.length: ',
   scrapedProducts.length,
   'mockProductData.length: ',

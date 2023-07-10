@@ -141,3 +141,20 @@ describe('getProductDataFromApi', () => {
     expect(result.total).toBeGreaterThan(1000);
   });
 });
+
+describe.skip('scrapeAllProducts (check test file for comments)', () => {
+  // as it is a recursive function I would have to find some ways to somehow mock the recursive calls
+  // for time I won't do that here but I will suggest some possible test cases:
+
+  it('should scrape all products within the initial price range', () => {
+    // do stuff
+  });
+  it('should add returned products to the scrapedProducts array', () => {
+    // do stuff
+  });
+  it('should continue scraping when the total exceeds 1000', () => {
+    // do stuff
+  });
+
+  // Add more test cases to cover different scenarios and edge cases
+});
