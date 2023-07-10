@@ -1,4 +1,4 @@
-import { Product, getSplitRanges, getProducts } from './index';
+import { Product, splitRangeInHalves, getProducts } from './index';
 import { mockProductData as largeDataset } from './mockProductApi';
 
 const mockProductData: Product[] = [
@@ -54,38 +54,35 @@ const mockProductData: Product[] = [
   },
 ];
 
-describe('getSplitRanges', () => {
+describe('splitRangeInHalves', () => {
   it('should return the halved ranges correctly', () => {
     const range = [1, 10];
     const expected = {
-      lowerRange: [1, 4],
+      lowerRange: [1, 4.99],
       upperRange: [5, 10],
     };
-    expect(getSplitRanges(range)).toEqual(expected);
+    expect(splitRangeInHalves(range)).toEqual(expected);
   });
 
   it('should handle zero correctly', () => {
     const range = [0, 10];
     const expected = {
-      lowerRange: [0, 4],
+      lowerRange: [0, 4.99],
       upperRange: [5, 10],
     };
-    expect(getSplitRanges(range)).toEqual(expected);
+    expect(splitRangeInHalves(range)).toEqual(expected);
   });
 
-  // this test indicates out why subtracting 1 from the max bound for one of the
-  // new split ranges is not ideal because it skips any price that has a 1$ difference
-  // between the two ranges (3.75 < price < 4.75).
   it('should handle floating-point numbers correctly', () => {
     const range = [1.5, 9.5];
     const expected = {
-      lowerRange: [1.5, 3.75],
-      upperRange: [4.75, 9.5],
+      lowerRange: [1.5, 4.99],
+      upperRange: [5, 9.5],
     };
-    expect(getSplitRanges(range)).toEqual(expected);
+    expect(splitRangeInHalves(range)).toEqual(expected);
   });
 
-  // maybe we could also include a test case for an error when passing negative values to the fn
+  // we could also include an invalid test case checking for an error when passing negative values to the fn
 });
 
 describe('getProducts', () => {

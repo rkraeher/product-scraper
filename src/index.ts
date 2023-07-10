@@ -12,6 +12,7 @@ interface ApiResponse {
   products: Product[];
 }
 
+const initialPriceRange = [0, 100000];
 let scrapedProducts: Product[] = [];
 let scrapedProductIds = new Set<string>();
 
@@ -19,6 +20,13 @@ let scrapedProductIds = new Set<string>();
 // handling different currencies and floats, etc.
 function convertPriceStringToNumber(price: string) {
   return parseInt(price);
+}
+
+export function splitRangeInHalves(range: number[]) {
+  return {
+    lowerRange: [range[0], Math.floor((range[0] + range[1]) / 2) - 0.01],
+    upperRange: [Math.floor((range[0] + range[1]) / 2), range[1]],
+  };
 }
 
 export function getProducts(range: number[], data: Product[]): ApiResponse {
@@ -56,21 +64,6 @@ export function getProducts(range: number[], data: Product[]): ApiResponse {
   };
 }
 
-export const getSplitRanges = (range: number[]) => {
-  // for now we will just handle non-negative integers
-
-  // let lowerRange = [range[0], range[1] / 2 - 1];
-  // let upperRange = [range[1] / 2, range[1]];
-
-  let lowerRange = [range[0], Math.floor((range[0] + range[1]) / 2) - 1];
-  let upperRange = [Math.floor((range[0] + range[1]) / 2), range[1]];
-
-  return {
-    lowerRange,
-    upperRange,
-  };
-};
-
 // function pushOrContinueToScrape(
 //   productApiReponse: ApiResponse,
 //   range: number[]
@@ -84,7 +77,7 @@ export const getSplitRanges = (range: number[]) => {
 // }
 
 function scrapeAllProducts(range: number[]) {
-  const { lowerRange, upperRange } = getSplitRanges(range);
+  const { lowerRange, upperRange } = splitRangeInHalves(range);
 
   // get products, total and count within this range
   // TODO: rename for clarity, because it isn't only the products but the apiResponse with total and count
@@ -116,7 +109,6 @@ function scrapeAllProducts(range: number[]) {
   console.log({ lowerRange, upperRange });
 }
 
-const initialPriceRange = [0, 100000];
 scrapeAllProducts(initialPriceRange);
 
 console.log(
