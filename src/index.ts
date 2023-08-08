@@ -13,12 +13,11 @@ interface ApiResponse {
 }
 
 const initialPriceRange = [0, 100000];
+const scrapedProductIds = new Map<string, boolean>();
 let scrapedProducts: Product[] = [];
-let scrapedProductIds = new Set<string>();
 let numberOfApiRequests = 0;
 
-// in a real life context there would be more robust validation/conversion,
-// handling different currencies and floats, etc.
+// in a real life context there would be more robust validation/conversion, handling different currencies and floats, etc.
 function convertPriceStringToNumber(price: string) {
   return parseInt(price);
 }
@@ -30,41 +29,38 @@ export function splitRangeInHalves(range: number[]) {
   };
 }
 
-// here we simulate calling the api and receiving a response back
-// in order to enable testing, I am scanning the entire mockData but of course
-// their api would just be sending us back this data and we would have to check for duplicates
 export function getProductDataFromApi(
   range: number[],
   data: Product[]
 ): ApiResponse {
-  let products: Product[] = [];
-  let productsInRange: string[] = [];
   const [min, max] = range;
+  let products: Product[] = [];
+  let allProductsInRange = 0;
+
+  // track for analytics
   numberOfApiRequests++;
 
   for (let product of data) {
     let price = convertPriceStringToNumber(product.price as string);
     const isPriceWithinRange = price >= min && price <= max;
-    // this is an inelegant solution to the problem I have of pushing duplicate products
-    // checking duplicates this way degrades performance
-    const isDuplicateProduct = scrapedProductIds.has(product.productId);
+    const productId = product.productId;
 
     if (isPriceWithinRange) {
-      if (products.length < 1000 && !isDuplicateProduct) {
+      allProductsInRange++;
+
+      if (products.length < 1000 && !scrapedProductIds.has(productId)) {
         products.push({
-          productId: product.productId,
+          productId,
           name: product.name,
           price,
         });
-        scrapedProductIds.add(product.productId);
+        scrapedProductIds.set(productId, true);
       }
-
-      productsInRange.push(product.productId);
     }
   }
 
   return {
-    total: productsInRange.length,
+    total: allProductsInRange,
     count: products.length,
     products,
   };
@@ -74,6 +70,8 @@ export function scrapeAllProducts(range: number[]) {
   const { lowerRange, upperRange } = splitRangeInHalves(range);
 
   const scrapeRange = (range: number[]) => {
+    // we pass entire mockProductData for simulation purposes
+    // we wouldn't have the full list of products but this script uses all the mockData just to get the value of 'total' and a list of products
     const { count, products, total } = getProductDataFromApi(
       range,
       mockProductData
@@ -94,7 +92,7 @@ export function scrapeAllProducts(range: number[]) {
 
 scrapeAllProducts(initialPriceRange);
 
-// do what we want with our scrapedProducts
+// do what we want with our scrapedProducts (return them, pass them somewhere for validation, de-duping, sorting etc.)
 console.log(
   scrapedProducts,
   'scrapedProducts.length: ',
