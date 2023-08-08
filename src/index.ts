@@ -12,7 +12,6 @@ interface ApiResponse {
   products: Product[];
 }
 
-const initialPriceRange = [0, 100000];
 const scrapedProductIds = new Map<string, boolean>();
 let scrapedProducts: Product[] = [];
 let numberOfApiRequests = 0;
@@ -29,6 +28,7 @@ export function splitRangeInHalves(range: number[]) {
   };
 }
 
+// this is a simulation helper, which would be uneccesary since the api directly provides its return values
 export function getProductDataFromApi(
   range: number[],
   data: Product[]
@@ -48,6 +48,7 @@ export function getProductDataFromApi(
     if (isPriceWithinRange) {
       allProductsInRange++;
 
+      // avoid duplicates as well
       if (products.length < 1000 && !scrapedProductIds.has(productId)) {
         products.push({
           productId,
@@ -66,14 +67,15 @@ export function getProductDataFromApi(
   };
 }
 
-export function scrapeAllProducts(range: number[]) {
-  const { lowerRange, upperRange } = splitRangeInHalves(range);
+export function scrapeAllProducts(
+  priceRange: number[],
+  totalNumberOfProducts: number
+) {
+  const { lowerRange, upperRange } = splitRangeInHalves(priceRange);
 
-  const scrapeRange = (range: number[]) => {
-    // we pass entire mockProductData for simulation purposes
-    // we wouldn't have the full list of products but this script uses all the mockData just to get the value of 'total' and a list of products
+  const scrapeRange = (priceRange: number[]) => {
     const { count, products, total } = getProductDataFromApi(
-      range,
+      priceRange,
       mockProductData
     );
 
@@ -81,8 +83,8 @@ export function scrapeAllProducts(range: number[]) {
       scrapedProducts.push(...products);
     }
 
-    if (total > 1000 && scrapedProducts.length < mockProductData.length) {
-      scrapeAllProducts(range);
+    if (total > 1000 && scrapedProducts.length < totalNumberOfProducts) {
+      scrapeAllProducts(priceRange, totalNumberOfProducts);
     }
   };
 
@@ -90,7 +92,13 @@ export function scrapeAllProducts(range: number[]) {
   scrapeRange(upperRange);
 }
 
-scrapeAllProducts(initialPriceRange);
+const initialPriceRange = [0, 100000];
+
+// this just simulates retrieving our upper limit, so we can use it as a condition to decide when scraping is complete.
+// I don't see a point to looping the mockData because we would get the total with 1 api call
+const totalNumberOfProductsWithinInitialRange = mockProductData.length;
+
+scrapeAllProducts(initialPriceRange, totalNumberOfProductsWithinInitialRange);
 
 // do what we want with our scrapedProducts (return them, pass them somewhere for validation, de-duping, sorting etc.)
 console.log(
