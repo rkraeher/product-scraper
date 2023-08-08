@@ -1,7 +1,4 @@
-## Web Automation Dev - Home assignment (public)
-
-This is a private repo between me and the hiring team.
-Here you can find and run code for my solution to this [assignment](https://apify.notion.site/Web-Automation-Dev-Home-assignment-public-f9be3a1c6b9543b29e5bccb9d9382a9c)
+## Web Automation Dev - Home assignment solution
 
 ### Installation and Usage
 
@@ -32,17 +29,20 @@ My program will execute the following tasks:
 - Narrow down the price range recursively until it returns with 1000 or less products in a certain range
 - Add those products within the range to a list of 'scraped products,' which will grow until we have scraped everything within whatever initial range we enter (in this case $0 - $100000)
 
-My intuition was to recursively split each range in half until the program receives an api response with 1000 products or less. I have tracked the number of api calls directly in the module for observability purposes.
-
 ### Assumptions
 
 - Since according to requirements we cannot pass sorting query params and we have no way of ensuring whether the products sent back in the `products` array property will always be the same, we must check for duplicates and we cannot proceed in some sequential order. Any sorting would have to be done by us during or after our scraping execution.
-- We assume the api itself neither contains nor responds with duplicates and has a unique id to identify it
-- We assume each product product has a consistent currency and singular price (i.e, no product will have a range of prices, only one price value)
+- We assume the api itself does not send duplicates and so each product has a unique id to identify it
+- We assume each product has a consistent currency and singular price (i.e, no product will have a range of prices, only one price value)
 
-### Problems
+### Conclusions
 
-There are two current problems:
+Notice that we have 28 api calls, whereas the minimum possible for 9999 products should be 10 (1000 products a call)
+We exceed the minimum in my solution because some extra, recursive calls must be made initially, in order to get
+a small enough price range that returns 1000 or less products. This is obviously not ideal, but on the other hand we should expect more than the absolute minimum, since we have no way of knowing in advance how many products are within certain ranges, and indeed some price ranges may contain more than 1000 products (there are probably many products in the 0-500 range, and fewer in the 75000-100000, etc.).
 
-- One is a performance issue, which is currently degraded because (as is commented in the code) we are checking for duplicates. As written, without this check duplicates end up being added to the scrapedProducts list, so I would want to fix that, although we would realistically probably still be checking our own list for duplicates given that the api may itself contain duplicate data.
-- Right now I don't have an implementation to prove that the entire list was scraped. I am checking for duplicates and that the scrapedProducts.length matches the mockData.length, which would initially get from calling out initial, widest range (0-100.000).
+A slightly different approach can be seen in the example provided on Apify docs for scraping websites with limited pagination: https://docs.apify.com/academy/advanced-web-scraping/scraping-paginated-sites#using-filter-ranges
+
+I could modify my solution to select some initial reasonable pivot ranges like in the example and thereby avoid several api calls that have very large initial ranges (0-100000).
+
+Nevertheless, notice that my recursive solution is in principle quite similar to the documented example.
